@@ -1,0 +1,68 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def load_and_prepare(filepath):
+    # Load Excel file without headers
+    df = pd.read_excel(filepath, header=None)
+
+    # Assign column names manually
+    df.columns = ['date', 'time', 'vr', 'ir', 'pf', 't1', 't2']
+
+    # Combine date and time to form a timestamp
+    df['timestamp'] = pd.to_datetime(df['date'].astype(str) + ' ' + df['time'].astype(str))
+
+    # Convert columns to numeric (handle possible non-numeric garbage)
+    for col in ['vr', 'ir', 't1', 't2']:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    # Drop rows with NaNs in those columns
+    df.dropna(subset=['vr', 'ir', 't1', 't2'], inplace=True)
+
+    # Set timestamp as index for plotting
+    df.set_index('timestamp', inplace=True)
+
+    return df[['vr', 'ir', 't1', 't2']]
+
+def plot_graphs(df):
+    plt.figure(figsize=(14, 10))
+
+    # Voltage vs Time
+    plt.subplot(2, 2, 1)
+    plt.plot(df.index, df['vr'], color='blue')
+    plt.title('Voltage (Vr) vs Time')
+    plt.xlabel('Time')
+    plt.ylabel('Voltage (Vr)')
+    plt.grid(True)
+
+    # Current vs Time
+    plt.subplot(2, 2, 2)
+    plt.plot(df.index, df['ir'], color='green')
+    plt.title('Current (Ir) vs Time')
+    plt.xlabel('Time')
+    plt.ylabel('Current (Ir)')
+    plt.grid(True)
+
+    # T1 vs Time
+    plt.subplot(2, 2, 3)
+    plt.plot(df.index, df['t1'], color='red')
+    plt.title('T1 vs Time')
+    plt.xlabel('Time')
+    plt.ylabel('T1')
+    plt.grid(True)
+
+    # T2 vs Time
+    plt.subplot(2, 2, 4)
+    plt.plot(df.index, df['t2'], color='orange')
+    plt.title('T2 vs Time')
+    plt.xlabel('Time')
+    plt.ylabel('T2')
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+# ===== Main Execution =====
+if __name__ == "__main__":
+    filepath = 'data/20250108LF.xlsx'  # Ensure it's in the same directory
+    df = load_and_prepare(filepath)
+    plot_graphs(df)

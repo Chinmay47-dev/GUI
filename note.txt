@@ -1,0 +1,27 @@
+from flask import Flask, render_template, request
+from low_freq import load_and_prepare
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        motor_data = {
+            "frequency": request.form.get('frequency'),
+            "voltage": request.form.get('voltage'),
+            "power": request.form.get('power'),
+            "current": request.form.get('current'),
+            "rpm": request.form.get('rpm'),
+            "pf": request.form.get('pf')
+        }
+
+    return render_template('index.html')
+
+@app.route('/low_frequency',methods=['POST'])
+def low_frequency():
+    pass
+    
+    
+
+if __name__ == '__main__':
+    app.run(debug=True)
